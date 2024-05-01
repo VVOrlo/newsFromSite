@@ -55,7 +55,7 @@ def log_news(news_list, file_path):
             file.write(f"Found Keywords: {', '.join(keywords)}\n")
             file.write('--------------------------------------------------------\n')
 
-def main(duration_hours=10):
+def main(duration_hours=4):
     processed_urls = set()  # Множество для отслеживания обработанных URL
     current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')  # Текущее время для создания имени файла
     log_file = f"cbsnews_log_{current_time}.txt"  # Имя лог-файла
