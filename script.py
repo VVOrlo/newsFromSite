@@ -15,7 +15,7 @@ def fetch_details(article_url):
         found_keywords = [keyword for keyword in keywords if keyword in article_text]  # Поиск ключевых слов в тексте
         return author, article_text, found_keywords
     except Exception as e:
-        print(f"Error fetching article details: {e}")
+        print(f"Ошибка при получении деталей статьи: {e}")
         return "Unknown author", "", []
 
 def fetch_news(processed_urls):
@@ -41,18 +41,19 @@ def fetch_news(processed_urls):
                         news_list.append((title, author, summary, article_url, found_keywords))  # Добавление новости в список
         return news_list
     except Exception as e:
-        print(f"Error fetching news: {e}")
+        print(f"Ошибка при получении новостей: {e}")
         return []
 
-def log_news(news_list, file_path):
+def log_news(news_list, file_path, log_time):
     with open(file_path, 'a', encoding='utf-8') as file:
+        file.write(f"\nНовости, полученные в {log_time}:\n")
         for title, author, summary, url, keywords in news_list:
             file.write('--------------------------------------------------------\n')
-            file.write(f"Title: {title}\n")
-            file.write(f"Author: {author}\n")
-            file.write(f"Summary: {summary}\n")
+            file.write(f"Заголовок: {title}\n")
+            file.write(f"Автор: {author}\n")
+            file.write(f"Описание: {summary}\n")
             file.write(f"URL: {url}\n")
-            file.write(f"Found Keywords: {', '.join(keywords)}\n")
+            file.write(f"Найденные ключевые слова: {', '.join(keywords)}\n")
             file.write('--------------------------------------------------------\n')
 
 def main(duration_hours=4):
@@ -60,14 +61,19 @@ def main(duration_hours=4):
     current_time = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')  # Текущее время для создания имени файла
     log_file = f"cbsnews_log_{current_time}.txt"  # Имя лог-файла
     with open(log_file, 'w', encoding='utf-8') as f:
-        f.write(f"Log started at {datetime.datetime.now()}\n")  # Запись времени начала лога
+        f.write(f"Лог начат в {datetime.datetime.now()}\n")  # Запись времени начала лога
+
+    # Первоначальный запрос для заполнения processed_urls без записи в лог
+    fetch_news(processed_urls)
+
     end_time = datetime.datetime.now() + datetime.timedelta(hours=duration_hours)  # Рассчитываем время окончания работы скрипта
     while datetime.datetime.now() < end_time:
+        log_time = datetime.datetime.now()  # Текущее время для записи в лог
         news = fetch_news(processed_urls)  # Получаем список новостей
-        log_news(news, log_file)  # Записываем новости в лог-файл
+        log_news(news, log_file, log_time)  # Записываем новости в лог-файл
         time.sleep(600)  # Пауза 10 минут перед следующим запросом
     with open(log_file, 'a', encoding='utf-8') as f:
-        f.write(f"Log ended at {datetime.datetime.now()}\n")  # Запись времени завершения лога
+        f.write(f"\nЛог завершен в {datetime.datetime.now()}\n")  # Запись времени завершения лога
 
 if __name__ == "__main__":
     main()
